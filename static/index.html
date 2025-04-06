@@ -407,8 +407,30 @@ Best,
                             addMessage(data.data.content, data.data.role === 'user');
                         } else if (data.event === 'sequence_update') {
                             // Update sequence in workspace
-                            console.log('Sequence updated:', data.data);
-                            // Implementation would depend on the specific UI update needed
+                            const sequence = data.data;
+                            
+                            // Update title
+                            const titleElement = document.querySelector('.workspace-section h2');
+                            titleElement.textContent = sequence.title;
+                            
+                            // Clear existing steps
+                            const existingSteps = document.querySelectorAll('.sequence-step');
+                            existingSteps.forEach(step => step.remove());
+                            
+                            // Add new steps
+                            sequence.steps.forEach(step => {
+                                addSequenceStep({
+                                    stepNumber: step.step_number,
+                                    type: step.type,
+                                    content: step.content
+                                });
+                            });
+                            
+                            // Add a message about the update if not already present
+                            const lastMessage = chatMessages.lastElementChild;
+                            if (!lastMessage || !lastMessage.textContent.includes('updated your sequence')) {
+                                addMessage(`I've updated your sequence "${sequence.title}" based on your request.`, false);
+                            }
                         }
                     } catch (error) {
                         console.error('Error processing WebSocket message:', error);
