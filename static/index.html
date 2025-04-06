@@ -88,6 +88,13 @@
         button:hover {
             background-color: #3a5ae8;
         }
+        .secondary-button {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .secondary-button:hover {
+            background-color: #e0e0e0;
+        }
         .message {
             padding: 0.75rem 1rem;
             border-radius: 8px;
@@ -107,11 +114,17 @@
             border-radius: 8px;
             padding: 1rem;
             margin-bottom: 1rem;
+            position: relative;
+        }
+        .sequence-step.editing {
+            border-color: #4a6cf7;
+            background-color: #f8f9fe;
         }
         .step-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.5rem;
+            align-items: center;
         }
         .step-number {
             font-weight: 600;
@@ -119,11 +132,27 @@
         }
         .step-content {
             white-space: pre-wrap;
+            margin-bottom: 1rem;
+        }
+        .step-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+        }
+        .sequence-step:hover .step-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .step-actions button {
+            padding: 4px 8px;
+            font-size: 0.75rem;
         }
         .add-step {
             margin-top: 1rem;
             display: flex;
             justify-content: center;
+            gap: 10px;
         }
         h1, h2, h3 {
             margin: 0;
@@ -148,11 +177,31 @@
         }
         .sequence-controls {
             display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
         }
-        .sequence-controls button {
+        .sequence-title {
+            margin-right: auto;
+        }
+        .sequence-title-edit {
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: none;
+            border-bottom: 2px solid #4a6cf7;
+            background: transparent;
+            padding: 0.25rem 0;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        .sequence-title-edit:focus {
+            outline: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .button-group button {
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
         }
@@ -161,6 +210,74 @@
         }
         .delete-button:hover {
             background-color: #d32f2f;
+        }
+        .edit-button {
+            background-color: #4caf50;
+        }
+        .edit-button:hover {
+            background-color: #388e3c;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 100%;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .step-editor textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 0.75rem;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+        .type-badge {
+            background-color: #e0e0e0;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .type-badge:hover {
+            background-color: #ccc;
+        }
+        .step-editor {
+            display: none;
         }
     </style>
 </head>
@@ -192,6 +309,54 @@
         </div>
     </main>
     
+    <!-- Step Editor Modal -->
+    <div id="step-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="step-modal-title">Edit Step</h3>
+            <div class="form-group">
+                <label for="step-type">Type:</label>
+                <select id="step-type">
+                    <option value="email">Email</option>
+                    <option value="message">Message</option>
+                    <option value="call">Call</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="step-content">Content:</label>
+                <textarea id="step-content"></textarea>
+            </div>
+            <div class="form-actions">
+                <button id="cancel-step-edit" class="secondary-button">Cancel</button>
+                <button id="save-step-edit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Step Modal -->
+    <div id="add-step-modal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Step</h3>
+            <div class="form-group">
+                <label for="new-step-type">Type:</label>
+                <select id="new-step-type">
+                    <option value="email">Email</option>
+                    <option value="message">Message</option>
+                    <option value="call">Call</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="new-step-content">Content:</label>
+                <textarea id="new-step-content"></textarea>
+            </div>
+            <div class="form-actions">
+                <button id="cancel-add-step" class="secondary-button">Cancel</button>
+                <button id="confirm-add-step">Add Step</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // DOM elements
@@ -200,9 +365,24 @@
             const sendButton = document.getElementById('send-button');
             const workspace = document.getElementById('workspace');
             
+            // Modals
+            const stepModal = document.getElementById('step-modal');
+            const stepModalTitle = document.getElementById('step-modal-title');
+            const stepType = document.getElementById('step-type');
+            const stepContent = document.getElementById('step-content');
+            const cancelStepEdit = document.getElementById('cancel-step-edit');
+            const saveStepEdit = document.getElementById('save-step-edit');
+            
+            const addStepModal = document.getElementById('add-step-modal');
+            const newStepType = document.getElementById('new-step-type');
+            const newStepContent = document.getElementById('new-step-content');
+            const cancelAddStep = document.getElementById('cancel-add-step');
+            const confirmAddStep = document.getElementById('confirm-add-step');
+            
             // State
             let isLoading = false;
             let currentSequence = null;
+            let currentEditingStep = null;
             
             // Function to add a message to the chat
             const addMessage = (content, isUser) => {
@@ -244,6 +424,73 @@
                 }
             };
             
+            // Function to open the step editor modal
+            const openStepEditor = (stepElement, stepNumber, type, content) => {
+                stepModalTitle.textContent = `Edit Step ${stepNumber}`;
+                stepType.value = type;
+                stepContent.value = content;
+                
+                currentEditingStep = {
+                    element: stepElement,
+                    stepNumber: stepNumber
+                };
+                
+                stepModal.style.display = 'flex';
+                stepContent.focus();
+            };
+            
+            // Function to close the step editor modal
+            const closeStepEditor = () => {
+                stepModal.style.display = 'none';
+                currentEditingStep = null;
+            };
+            
+            // Function to open the add step modal
+            const openAddStepModal = () => {
+                newStepType.value = 'email';
+                newStepContent.value = '';
+                addStepModal.style.display = 'flex';
+                newStepContent.focus();
+            };
+            
+            // Function to close the add step modal
+            const closeAddStepModal = () => {
+                addStepModal.style.display = 'none';
+            };
+            
+            // Function to make the sequence title editable
+            const makeSequenceTitleEditable = (titleElement) => {
+                const currentTitle = titleElement.textContent;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'sequence-title-edit';
+                input.value = currentTitle;
+                
+                titleElement.replaceWith(input);
+                input.focus();
+                input.select();
+                
+                const saveTitle = () => {
+                    if (input.value.trim() && currentSequence) {
+                        updateSequenceTitle(currentSequence.id, input.value.trim());
+                    }
+                    
+                    const newTitle = document.createElement('h2');
+                    newTitle.className = 'sequence-title';
+                    newTitle.textContent = input.value.trim() || currentTitle;
+                    newTitle.addEventListener('dblclick', () => makeSequenceTitleEditable(newTitle));
+                    
+                    input.replaceWith(newTitle);
+                };
+                
+                input.addEventListener('blur', saveTitle);
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        saveTitle();
+                    }
+                });
+            };
+            
             // Add a sequence step to the workspace
             const addSequenceStep = (step) => {
                 const stepElement = document.createElement('div');
@@ -258,8 +505,12 @@
                 stepNumber.textContent = `Step ${step.step_number}`;
                 
                 const stepType = document.createElement('div');
-                stepType.className = 'step-type';
+                stepType.className = 'type-badge';
                 stepType.textContent = step.type.charAt(0).toUpperCase() + step.type.slice(1);
+                stepType.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openTypeSelector(stepElement, step.step_number);
+                });
                 
                 stepHeader.appendChild(stepNumber);
                 stepHeader.appendChild(stepType);
@@ -268,8 +519,37 @@
                 stepContent.className = 'step-content';
                 stepContent.textContent = step.content;
                 
+                // Step action buttons
+                const stepActions = document.createElement('div');
+                stepActions.className = 'step-actions';
+                
+                const editButton = document.createElement('button');
+                editButton.className = 'edit-button';
+                editButton.textContent = 'Edit';
+                editButton.addEventListener('click', () => {
+                    openStepEditor(stepElement, step.step_number, step.type, step.content);
+                });
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => {
+                    if (confirm(`Are you sure you want to delete Step ${step.step_number}?`)) {
+                        deleteStep(step.step_number);
+                    }
+                });
+                
+                stepActions.appendChild(editButton);
+                stepActions.appendChild(deleteButton);
+                
                 stepElement.appendChild(stepHeader);
                 stepElement.appendChild(stepContent);
+                stepElement.appendChild(stepActions);
+                
+                // Make step editable on double-click
+                stepElement.addEventListener('dblclick', () => {
+                    openStepEditor(stepElement, step.step_number, step.type, step.content);
+                });
                 
                 return stepElement;
             };
@@ -282,14 +562,19 @@
                 // Clear workspace
                 workspace.innerHTML = '';
                 
-                // Add title
-                const title = document.createElement('h2');
-                title.textContent = sequence.title;
-                workspace.appendChild(title);
-                
-                // Add controls
+                // Add sequence controls
                 const controls = document.createElement('div');
                 controls.className = 'sequence-controls';
+                
+                const title = document.createElement('h2');
+                title.className = 'sequence-title';
+                title.textContent = sequence.title;
+                
+                // Make title editable on double-click
+                title.addEventListener('dblclick', () => makeSequenceTitleEditable(title));
+                
+                const buttonGroup = document.createElement('div');
+                buttonGroup.className = 'button-group';
                 
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-button';
@@ -300,7 +585,11 @@
                     }
                 });
                 
-                controls.appendChild(deleteButton);
+                buttonGroup.appendChild(deleteButton);
+                
+                controls.appendChild(title);
+                controls.appendChild(buttonGroup);
+                
                 workspace.appendChild(controls);
                 
                 // Add steps
@@ -311,7 +600,7 @@
                 } else {
                     const placeholder = document.createElement('p');
                     placeholder.className = 'placeholder-text';
-                    placeholder.textContent = 'This sequence has no steps yet. Ask Helix to add some!';
+                    placeholder.textContent = 'This sequence has no steps yet. Add some or ask Helix to help you!';
                     workspace.appendChild(placeholder);
                 }
                 
@@ -321,14 +610,143 @@
                 
                 const addStepButton = document.createElement('button');
                 addStepButton.textContent = 'Add Step Manually';
-                addStepButton.addEventListener('click', () => {
-                    // In a real app, this would open a form to add a step
-                    // For now, we'll just ask the user to use Helix
-                    addMessage('To add a step, please ask me to "add a step" with the content you want.', false);
+                addStepButton.addEventListener('click', openAddStepModal);
+                
+                const generateButton = document.createElement('button');
+                generateButton.textContent = 'Generate with AI';
+                generateButton.addEventListener('click', () => {
+                    chatInput.value = `Add a new step to the sequence`;
+                    sendButton.click();
                 });
                 
                 addStepDiv.appendChild(addStepButton);
+                addStepDiv.appendChild(generateButton);
+                
                 workspace.appendChild(addStepDiv);
+            };
+            
+            // Create a new empty workspace
+            const createEmptyWorkspace = () => {
+                workspace.innerHTML = `
+                    <h2>Outreach Sequence</h2>
+                    <p class="placeholder-text">Your outreach sequence will appear here. Ask Helix to create one for you!</p>
+                `;
+            };
+            
+            // Function to update a step
+            const updateStep = async (stepNumber, type, content) => {
+                if (!currentSequence) return;
+                
+                try {
+                    const response = await fetch(`/api/sequences/${currentSequence.id}/steps/${getStepIdByNumber(stepNumber)}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            type,
+                            content,
+                            step_number: stepNumber
+                        }),
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to update step');
+                    }
+                    
+                    // Refresh the sequence
+                    await checkForSequenceUpdates();
+                    
+                    addMessage(`I've updated Step ${stepNumber} with your changes.`, false);
+                    
+                } catch (error) {
+                    console.error('Error updating step:', error);
+                    alert('Failed to update step. Please try again.');
+                }
+            };
+            
+            // Function to add a new step
+            const addStep = async (type, content) => {
+                if (!currentSequence) return;
+                
+                try {
+                    const response = await fetch(`/api/sequences/${currentSequence.id}/steps`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            type,
+                            content
+                        }),
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to add step');
+                    }
+                    
+                    // Refresh the sequence
+                    await checkForSequenceUpdates();
+                    
+                    addMessage(`I've added a new ${type} step to your sequence.`, false);
+                    
+                } catch (error) {
+                    console.error('Error adding step:', error);
+                    alert('Failed to add step. Please try again.');
+                }
+            };
+            
+            // Function to delete a step
+            const deleteStep = async (stepNumber) => {
+                if (!currentSequence) return;
+                
+                try {
+                    const stepId = getStepIdByNumber(stepNumber);
+                    if (!stepId) return;
+                    
+                    const response = await fetch(`/api/steps/${stepId}`, {
+                        method: 'DELETE',
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to delete step');
+                    }
+                    
+                    // Refresh the sequence
+                    await checkForSequenceUpdates();
+                    
+                    addMessage(`I've deleted Step ${stepNumber} from your sequence.`, false);
+                    
+                } catch (error) {
+                    console.error('Error deleting step:', error);
+                    alert('Failed to delete step. Please try again.');
+                }
+            };
+            
+            // Function to update sequence title
+            const updateSequenceTitle = async (sequenceId, title) => {
+                try {
+                    const response = await fetch(`/api/sequences/${sequenceId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ title }),
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to update sequence title');
+                    }
+                    
+                    // Refresh the sequence
+                    await checkForSequenceUpdates();
+                    
+                    addMessage(`I've updated the sequence title to "${title}".`, false);
+                    
+                } catch (error) {
+                    console.error('Error updating sequence title:', error);
+                    alert('Failed to update sequence title. Please try again.');
+                }
             };
             
             // Function to send a message to the backend
@@ -423,6 +841,14 @@
                 }
             };
             
+            // Helper function to get step ID by step number
+            const getStepIdByNumber = (stepNumber) => {
+                if (!currentSequence || !currentSequence.steps) return null;
+                
+                const step = currentSequence.steps.find(s => s.step_number === parseInt(stepNumber));
+                return step ? step.id : null;
+            };
+            
             // Function to check for sequence updates
             const checkForSequenceUpdates = async () => {
                 try {
@@ -440,7 +866,7 @@
                         
                         // Check if this is a new sequence or if the current one was updated
                         if (!currentSequence || latestSequence.id !== currentSequence.id || 
-                            JSON.stringify(latestSequence) !== JSON.stringify(currentSequence)) {
+                            new Date(latestSequence.createdAt) > new Date(currentSequence.createdAt)) {
                             
                             // Get the full sequence with steps
                             const detailResponse = await fetch(`/api/sequences/${latestSequence.id}`);
@@ -449,7 +875,22 @@
                                 const fullSequence = await detailResponse.json();
                                 updateWorkspace(fullSequence);
                             }
+                        } else if (currentSequence) {
+                            // Get the latest version of the current sequence
+                            const detailResponse = await fetch(`/api/sequences/${currentSequence.id}`);
+                            
+                            if (detailResponse.ok) {
+                                const updatedSequence = await detailResponse.json();
+                                
+                                // Update only if there are changes
+                                if (JSON.stringify(updatedSequence) !== JSON.stringify(currentSequence)) {
+                                    updateWorkspace(updatedSequence);
+                                }
+                            }
                         }
+                    } else if (!currentSequence) {
+                        // No sequences exist
+                        createEmptyWorkspace();
                     }
                 } catch (error) {
                     console.error('Error checking for sequence updates:', error);
@@ -468,11 +909,7 @@
                     }
                     
                     // Reset workspace
-                    workspace.innerHTML = `
-                        <h2>Outreach Sequence</h2>
-                        <p class="placeholder-text">Your outreach sequence will appear here. Ask Helix to create one for you!</p>
-                    `;
-                    
+                    createEmptyWorkspace();
                     currentSequence = null;
                     
                     addMessage('I\'ve deleted the sequence. Would you like to create a new one?', false);
@@ -498,8 +935,50 @@
                 }
             });
             
+            // Step editor modal events
+            cancelStepEdit.addEventListener('click', closeStepEditor);
+            
+            saveStepEdit.addEventListener('click', () => {
+                if (currentEditingStep) {
+                    updateStep(
+                        currentEditingStep.stepNumber,
+                        stepType.value,
+                        stepContent.value
+                    );
+                    closeStepEditor();
+                }
+            });
+            
+            // Add step modal events
+            cancelAddStep.addEventListener('click', closeAddStepModal);
+            
+            confirmAddStep.addEventListener('click', () => {
+                const type = newStepType.value;
+                const content = newStepContent.value.trim();
+                
+                if (content) {
+                    addStep(type, content);
+                    closeAddStepModal();
+                } else {
+                    alert('Please enter content for the step.');
+                }
+            });
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === stepModal) {
+                    closeStepEditor();
+                }
+                if (e.target === addStepModal) {
+                    closeAddStepModal();
+                }
+            });
+            
             // Initialize by checking for existing sequences
             checkForSequenceUpdates();
+            
+            // Poll for updates every 5 seconds
+            setInterval(checkForSequenceUpdates, 5000);
             
             // Focus input on load
             chatInput.focus();
