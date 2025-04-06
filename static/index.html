@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helix: Agentic Recruiter Platform</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #4a6cf7;
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        main {
+            flex: 1;
+            display: flex;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .app-layout {
+            display: flex;
+            height: calc(100vh - 120px);
+            gap: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chat-section {
+            flex: 1;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+        }
+        .workspace-section {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow: auto;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #eaeaea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        input, textarea {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        button {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #3a5ae8;
+        }
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #e1ecfe;
+            align-self: flex-end;
+        }
+        .assistant-message {
+            background-color: #f2f2f2;
+            align-self: flex-start;
+        }
+        .sequence-step {
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .step-number {
+            font-weight: 600;
+            color: #4a6cf7;
+        }
+        .step-content {
+            white-space: pre-wrap;
+        }
+        .add-step {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+        h1, h2, h3 {
+            margin: 0;
+        }
+        .placeholder-text {
+            text-align: center;
+            color: #888;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Helix: Agentic Recruiter Platform</h1>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <div class="app-layout">
+                <section class="chat-section">
+                    <div class="chat-messages">
+                        <div class="message assistant-message">
+                            <p>Hello! I'm Helix, your AI recruiting assistant. How can I help you today?</p>
+                        </div>
+                        <div class="message user-message">
+                            <p>I need to create an outreach sequence for a senior developer role.</p>
+                        </div>
+                        <div class="message assistant-message">
+                            <p>I'd be happy to help you create an outreach sequence for a senior developer role. Let me know what kind of tone and approach you'd like to use, and any specific details about the position that would be helpful to include.</p>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Type your message here..." />
+                        <button>Send</button>
+                    </div>
+                </section>
+                <section class="workspace-section">
+                    <h2>Outreach Sequence</h2>
+                    <div class="sequence-step">
+                        <div class="step-header">
+                            <div class="step-number">Step 1</div>
+                            <div class="step-type">Email</div>
+                        </div>
+                        <div class="step-content">
+                            Subject: Exciting Senior Developer Opportunity at [Company]
+
+Hi [Name],
+
+I came across your profile and was impressed by your experience with [relevant technology]. We're looking for a Senior Developer to join our team at [Company], and I think your background could be a great fit.
+
+Would you be open to a quick chat about this opportunity?
+
+Best,
+[Your Name]
+                        </div>
+                    </div>
+                    <div class="sequence-step">
+                        <div class="step-header">
+                            <div class="step-number">Step 2</div>
+                            <div class="step-type">Message</div>
+                        </div>
+                        <div class="step-content">
+                            Hi [Name], just following up on my email about the Senior Developer role. I'd love to tell you more about the exciting projects we're working on. Let me know if you'd be interested in connecting.
+                        </div>
+                    </div>
+                    <div class="add-step">
+                        <button>Add Step</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    <script>
+        // Placeholder for dynamic functionality
+        // This would be replaced with the React application
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputField = document.querySelector('.chat-input input');
+            const sendButton = document.querySelector('.chat-input button');
+            const chatMessages = document.querySelector('.chat-messages');
+            
+            // Simple function to add a message
+            const addMessage = (text, isUser) => {
+                const message = document.createElement('div');
+                message.className = `message ${isUser ? 'user-message' : 'assistant-message'}`;
+                const p = document.createElement('p');
+                p.textContent = text;
+                message.appendChild(p);
+                chatMessages.appendChild(message);
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            };
+            
+            // Handle send button click
+            sendButton.addEventListener('click', () => {
+                const text = inputField.value.trim();
+                if (text) {
+                    addMessage(text, true);
+                    inputField.value = '';
+                    
+                    // Mock response
+                    setTimeout(() => {
+                        addMessage("I understand you're interested in " + text + ". Let me help you with that.", false);
+                    }, 1000);
+                }
+            });
+            
+            // Handle enter key
+            inputField.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendButton.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
