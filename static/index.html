@@ -190,7 +190,31 @@ Best,
                         </div>
                     </div>
                     <div class="add-step">
-                        <button>Add Step</button>
+                        <button class="add-step-button">Add Step</button>
+                        <button class="generate-sequence" style="margin-left: 10px; background-color: #6a5af9;">Generate with AI</button>
+                    </div>
+                    
+                    <!-- AI Generation Modal -->
+                    <div id="ai-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+                        <div class="modal-content" style="background-color: white; padding: 20px; border-radius: 8px; width: 500px; max-width: 90%;">
+                            <h3>Generate Sequence with AI</h3>
+                            <div style="margin-bottom: 15px;">
+                                <label for="job-title">Job Title:</label>
+                                <input type="text" id="job-title" style="width: 100%; margin-top: 5px;" placeholder="e.g., Senior Frontend Developer">
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label for="company-name">Company Name:</label>
+                                <input type="text" id="company-name" style="width: 100%; margin-top: 5px;" placeholder="e.g., Acme Inc.">
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label for="job-details">Additional Details (optional):</label>
+                                <textarea id="job-details" style="width: 100%; margin-top: 5px; height: 100px;" placeholder="Skills, requirements, company culture, etc."></textarea>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                                <button id="cancel-generate" style="background-color: #f2f2f2; color: #333;">Cancel</button>
+                                <button id="confirm-generate" style="background-color: #4a6cf7;">Generate</button>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -204,6 +228,16 @@ Best,
             const sendButton = document.querySelector('.chat-input button');
             const chatMessages = document.querySelector('.chat-messages');
             
+            // AI Modal elements
+            const generateButton = document.querySelector('.generate-sequence');
+            const aiModal = document.getElementById('ai-modal');
+            const cancelButton = document.getElementById('cancel-generate');
+            const confirmButton = document.getElementById('confirm-generate');
+            const jobTitleInput = document.getElementById('job-title');
+            const companyNameInput = document.getElementById('company-name');
+            const jobDetailsInput = document.getElementById('job-details');
+            const workspaceSection = document.querySelector('.workspace-section');
+            
             // Simple function to add a message
             const addMessage = (text, isUser) => {
                 const message = document.createElement('div');
@@ -216,6 +250,109 @@ Best,
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             };
             
+            // Function to send a message to the AI backend
+            const sendMessageToAI = async (text) => {
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ content: text }),
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to send message');
+                    }
+                    
+                    // The assistant's response will come via WebSocket
+                    
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    addMessage('Sorry, there was an error sending your message. Please try again.', false);
+                }
+            };
+            
+            // Function to add a sequence step to the workspace
+            const addSequenceStep = (step) => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'sequence-step';
+                stepElement.innerHTML = `
+                    <div class="step-header">
+                        <div class="step-number">Step ${step.stepNumber}</div>
+                        <div class="step-type">${step.type.charAt(0).toUpperCase() + step.type.slice(1)}</div>
+                    </div>
+                    <div class="step-content">${step.content}</div>
+                `;
+                
+                // Insert before the add-step button
+                const addStepDiv = document.querySelector('.add-step');
+                workspaceSection.insertBefore(stepElement, addStepDiv);
+            };
+            
+            // Function to generate a sequence with AI
+            const generateSequence = async () => {
+                const jobTitle = jobTitleInput.value.trim();
+                const companyName = companyNameInput.value.trim();
+                const details = jobDetailsInput.value.trim();
+                
+                if (!jobTitle || !companyName) {
+                    alert('Job title and company name are required');
+                    return;
+                }
+                
+                try {
+                    // Show loading state
+                    confirmButton.textContent = 'Generating...';
+                    confirmButton.disabled = true;
+                    
+                    const response = await fetch('/api/sequences/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            job_title: jobTitle,
+                            company_name: companyName,
+                            details: details
+                        }),
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to generate sequence');
+                    }
+                    
+                    const sequence = await response.json();
+                    
+                    // Clear existing steps
+                    const existingSteps = document.querySelectorAll('.sequence-step');
+                    existingSteps.forEach(step => step.remove());
+                    
+                    // Update title
+                    const titleElement = document.querySelector('.workspace-section h2');
+                    titleElement.textContent = sequence.title;
+                    
+                    // Add new steps
+                    sequence.steps.forEach(step => {
+                        addSequenceStep(step);
+                    });
+                    
+                    // Close modal
+                    aiModal.style.display = 'none';
+                    
+                    // Add message to chat
+                    addMessage(`I've generated a new outreach sequence for a ${jobTitle} at ${companyName}. Check it out in the workspace!`, false);
+                    
+                } catch (error) {
+                    console.error('Error generating sequence:', error);
+                    alert('Failed to generate sequence. Please try again.');
+                } finally {
+                    // Reset button
+                    confirmButton.textContent = 'Generate';
+                    confirmButton.disabled = false;
+                }
+            };
+            
             // Handle send button click
             sendButton.addEventListener('click', () => {
                 const text = inputField.value.trim();
@@ -223,10 +360,8 @@ Best,
                     addMessage(text, true);
                     inputField.value = '';
                     
-                    // Mock response
-                    setTimeout(() => {
-                        addMessage("I understand you're interested in " + text + ". Let me help you with that.", false);
-                    }, 1000);
+                    // Send message to AI backend
+                    sendMessageToAI(text);
                 }
             });
             
@@ -236,6 +371,58 @@ Best,
                     sendButton.click();
                 }
             });
+            
+            // Handle generate button click
+            generateButton.addEventListener('click', () => {
+                aiModal.style.display = 'flex';
+            });
+            
+            // Handle cancel button click
+            cancelButton.addEventListener('click', () => {
+                aiModal.style.display = 'none';
+            });
+            
+            // Handle confirm button click
+            confirmButton.addEventListener('click', generateSequence);
+            
+            // Close modal when clicking outside
+            aiModal.addEventListener('click', (e) => {
+                if (e.target === aiModal) {
+                    aiModal.style.display = 'none';
+                }
+            });
+            
+            // Set up WebSocket connection for real-time updates
+            const setupWebSocket = () => {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const socket = new WebSocket(`${protocol}//${window.location.host}/socket.io/`);
+                
+                socket.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        
+                        // Handle different message types
+                        if (data.event === 'message') {
+                            // Add new message to chat
+                            addMessage(data.data.content, data.data.role === 'user');
+                        } else if (data.event === 'sequence_update') {
+                            // Update sequence in workspace
+                            console.log('Sequence updated:', data.data);
+                            // Implementation would depend on the specific UI update needed
+                        }
+                    } catch (error) {
+                        console.error('Error processing WebSocket message:', error);
+                    }
+                };
+                
+                socket.onclose = () => {
+                    // Attempt to reconnect
+                    setTimeout(setupWebSocket, 3000);
+                };
+            };
+            
+            // Initialize WebSocket
+            // setupWebSocket();
         });
     </script>
 </body>

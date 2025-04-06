@@ -2,7 +2,11 @@ from flask import Blueprint, request, jsonify
 from app import db, socketio
 from app.models.sequence import Sequence, SequenceStep
 from app.models.user import User
+from app.services.ai import ai_service
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('sequences', __name__, url_prefix='/api')
 
@@ -200,3 +204,57 @@ def delete_step(step_id):
     socketio.emit('sequence_update', sequence.to_dict())
     
     return jsonify({'message': 'Step deleted'})
+
+@bp.route('/sequences/generate', methods=['POST'])
+def generate_sequence():
+    """Generate a complete outreach sequence using AI"""
+    data = request.get_json()
+    
+    if not data or 'job_title' not in data or 'company_name' not in data:
+        return jsonify({'error': 'Job title and company name are required'}), 400
+    
+    job_title = data['job_title']
+    company_name = data['company_name']
+    details = data.get('details', '')
+    
+    user = get_default_user()
+    
+    try:
+        # Generate sequence steps using AI
+        logger.info(f"Generating sequence for {job_title} at {company_name}")
+        sequence_steps = ai_service.generate_outreach_sequence(job_title, company_name, details)
+        
+        if not sequence_steps:
+            return jsonify({'error': 'Failed to generate sequence'}), 500
+        
+        # Create a new sequence
+        sequence_title = f"{job_title} at {company_name}"
+        sequence = Sequence(
+            user_id=user.id,
+            title=sequence_title,
+            created_at=datetime.utcnow()
+        )
+        
+        db.session.add(sequence)
+        db.session.commit()
+        
+        # Add steps to the sequence
+        for i, step_data in enumerate(sequence_steps, 1):
+            step = SequenceStep(
+                sequence_id=sequence.id,
+                step_number=i,
+                content=step_data['content'],
+                type=step_data['type']
+            )
+            db.session.add(step)
+        
+        db.session.commit()
+        
+        # Emit sequence creation event
+        socketio.emit('sequence_update', sequence.to_dict())
+        
+        return jsonify(sequence.to_dict()), 201
+        
+    except Exception as e:
+        logger.error(f"Error generating sequence: {str(e)}")
+        return jsonify({'error': f"Failed to generate sequence: {str(e)}"}), 500
