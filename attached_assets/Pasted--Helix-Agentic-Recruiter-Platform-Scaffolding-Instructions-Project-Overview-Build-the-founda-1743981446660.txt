@@ -1,0 +1,143 @@
+# Helix: Agentic Recruiter Platform - Scaffolding Instructions
+
+## Project Overview
+Build the foundation for an agentic AI recruiting assistant called Helix. This project requires a chat-driven interface that collects user input and a dynamic workspace displaying recruiting outreach sequences. The AI will intelligently guide recruiters through creating personalized outreach campaigns.
+
+## Technical Requirements
+
+### Frontend (React + TypeScript + shadcn/ui)
+- TypeScript-based React application with a split-screen layout
+- Left side: Chat interface with message history and input area
+- Right side: Dynamic workspace showing sequence steps
+- Real-time updates between chat and workspace components
+
+### Backend (Flask + PostgreSQL)
+- RESTful API endpoints for chat processing and sequence management
+- WebSocket implementation for real-time updates
+- Database connection and schema for storing recruiting sequences
+
+## Specific Components to Build
+
+### 1. Frontend Structure
+- Main layout with responsive split-screen design
+- Chat component with message bubbles (distinguishing user/AI) and input field
+- Workspace component with editable sequence steps
+- State management using React Context API for chat history and sequence data
+
+### 2. Backend Structure
+- Flask application with RESTful routing
+- PostgreSQL database connection and models
+- WebSocket implementation for real-time updates
+- Basic endpoint structure for chat and sequence management
+
+### 3. Database Schema
+- Users table (id, name, email)
+- Sequences table (id, user_id, title, created_at)
+- SequenceSteps table (id, sequence_id, step_number, content, type)
+- Messages table (id, user_id, content, role, timestamp)
+
+## Detailed Implementation Instructions
+
+### Frontend Implementation
+
+1. **Project Setup**
+   - Initialize a TypeScript React project
+   - Install and configure shadcn/ui components
+   - Configure prettier and ESLint
+
+2. **Component Structure**
+   - Create a main App component with the split layout
+   - Implement a reusable Chat component with:
+     - Message history display
+     - Input field with send button
+     - Loading/thinking states
+   - Implement a Workspace component with:
+     - Header and controls
+     - Sequence step cards (editable)
+     - "No sequence" placeholder state
+
+3. **State Management**
+   - Implement React Context for global state
+   - Create types for all data structures (Message, SequenceStep, etc.)
+   - Set up WebSocket connection for real-time updates
+
+### Backend Implementation
+
+1. **Project Setup**
+   - Initialize a Flask application with proper structure
+   - Configure CORS for frontend communication
+   - Set up WebSocket support with Flask-SocketIO
+   - Configure PostgreSQL connection
+
+2. **API Endpoints**
+   - `/api/chat` - POST endpoint for sending user messages
+   - `/api/sequences` - GET/POST endpoints for sequence management
+   - `/api/sequences/<id>/steps` - endpoints for managing sequence steps
+
+3. **Database Models**
+   - Implement SQLAlchemy models for all tables
+   - Create migration scripts for database setup
+   - Add seed data for testing
+
+4. **WebSocket Events**
+   - `message` event for real-time chat updates
+   - `sequence_update` event for workspace changes
+   - `editing_sequence` event for collaborative editing
+
+## UI/UX Requirements
+
+1. **Chat Interface**
+   - Clean, modern message bubbles using shadcn/ui components
+   - Clear visual distinction between user and AI messages
+   - Subtle animations for new messages and loading states
+   - Input area with send button and optional attachments
+
+2. **Workspace Interface**
+   - Card-based layout for sequence steps
+   - Step numbers and editable content areas
+   - Add/remove step controls
+   - Preview/save/publish controls
+
+## Placeholder for AI Logic
+
+- Add comment placeholders where AI logic will be integrated
+- Create basic function structures for:
+  - Message processing
+  - Sequence generation
+  - Sequence modification based on user edits
+
+## Testing Data
+
+- Include sample recruiting sequences for testing
+- Add mock user data
+- Create sample chat histories
+
+## Important Notes for Implementation
+
+1. Focus on modularity - each component should be reusable and well-encapsulated
+2. Use TypeScript interfaces for all data structures
+3. Implement proper error handling throughout
+4. Add detailed comments explaining integration points for agentic AI components
+5. Use shadcn/ui components consistently for a modern, cohesive design
+6. Ensure responsive design works on different screen sizes
+
+## Do Not Implement (I'll handle these myself)
+
+- Complex AI logic and prompt engineering
+- Integration with external AI APIs (OpenAI, etc.)
+- Advanced agentic architecture components
+- Tool calling framework
+- Complex state management beyond basic context
+- Authentication system
+
+## Expected Output
+
+A functional scaffolding with:
+1. Working chat interface that sends/receives messages
+2. Workspace that displays sequence steps
+3. Basic real-time updates between components
+4. Database schema and API endpoints ready for extension
+5. Clean, modern UI using shadcn/ui components
+6. Clear documentation of integration points for AI components
+
+This scaffolding should provide a solid foundation that I can build upon to implement the agentic AI architecture and more complex features.

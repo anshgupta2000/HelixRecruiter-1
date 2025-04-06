@@ -1,0 +1,73 @@
+helix/
+│
+├── frontend/                       # React TypeScript frontend
+│   ├── src/
+│   │   ├── assets/                 # Static assets
+│   │   ├── components/             # UI components
+│   │   │   ├── Chat/               # Chat interface components
+│   │   │   │   ├── ChatBubble.tsx
+│   │   │   │   ├── ChatInput.tsx
+│   │   │   │   └── ChatContainer.tsx
+│   │   │   ├── Workspace/          # Workspace components
+│   │   │   │   ├── SequenceStep.tsx
+│   │   │   │   ├── SequenceEditor.tsx
+│   │   │   │   └── WorkspaceContainer.tsx
+│   │   │   ├── Layout/             # Layout components
+│   │   │   │   ├── MainLayout.tsx
+│   │   │   │   ├── Sidebar.tsx
+│   │   │   │   └── Header.tsx
+│   │   │   └── ui/                 # shadcn/ui components
+│   │   ├── contexts/               # React contexts
+│   │   │   ├── ChatContext.tsx     # Chat state management
+│   │   │   └── SequenceContext.tsx # Sequence state management
+│   │   ├── hooks/                  # Custom React hooks
+│   │   │   ├── useChat.ts          # Chat functionality
+│   │   │   ├── useSocket.ts        # WebSocket connection
+│   │   │   └── useSequence.ts      # Sequence management
+│   │   ├── services/               # API services
+│   │   │   ├── api.ts              # API base configuration
+│   │   │   ├── chatService.ts      # Chat API methods
+│   │   │   └── sequenceService.ts  # Sequence API methods
+│   │   ├── types/                  # TypeScript type definitions
+│   │   │   ├── chat.ts             # Chat-related types
+│   │   │   └── sequence.ts         # Sequence-related types
+│   │   ├── utils/                  # Utility functions
+│   │   ├── App.tsx                 # Main app component
+│   │   └── index.tsx               # Entry point
+│   ├── public/
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── backend/                        # Flask backend
+│   ├── app/
+│   │   ├── __init__.py             # Flask app initialization
+│   │   ├── routes/
+│   │   │   ├── __init__.py
+│   │   │   ├── chat.py             # Chat endpoints
+│   │   │   └── sequences.py        # Sequence endpoints
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   ├── user.py             # User model
+│   │   │   ├── message.py          # Message model
+│   │   │   └── sequence.py         # Sequence models
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── database.py         # Database utilities
+│   │   │   └── socket.py           # WebSocket utilities
+│   │   ├── utils/
+│   │   │   ├── __init__.py
+│   │   │   └── helpers.py          # Helper functions
+│   │   └── config.py               # Configuration settings
+│   ├── migrations/                 # Database migrations
+│   ├── tests/                      # Backend tests
+│   ├── requirements.txt            # Python dependencies
+│   └── run.py                      # Application entry point
+│
+├── database/                       # Database scripts
+│   ├── schema.sql                  # Schema definition
+│   └── seed.sql                    # Seed data
+│
+└── docs/                           # Documentation
+    ├── api.md                      # API documentation
+    ├── setup.md                    # Setup instructions
+    └── architecture.md             # Architecture overview
