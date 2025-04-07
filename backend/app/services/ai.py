@@ -40,9 +40,13 @@ class AnthropicAI:
         - Suggest multiple follow-up steps and templates for a complete outreach sequence
         
         IMPORTANT WORKFLOW:
-        When a user asks to generate a sequence:
-        1. First, ask ONE follow-up question to gather more specific details about the job, requirements, etc.
-        2. After the user responds, generate a complete sequence and include the special ACTION blocks (see below).
+        When a user asks to generate a sequence (e.g., "create a sequence for a software engineer at Google"):
+        1. FIRST, respond with ONLY ONE follow-up question to gather essential details. Keep this question brief (1-2 lines) and focused on the most important information needed. Do not generate any sequence yet, just ask the follow-up question.
+           Example: "What specific skills or experience are most important for this Software Engineer role at Google?"
+        
+        2. AFTER the user responds to your follow-up question, THEN generate a complete sequence using the special ACTION block. Include both the original request information and the details from their follow-up response.
+        
+        This two-step process is essential - never skip the follow-up question step when a user requests a new sequence.
         
         You must be able to understand and respond to commands for modifying sequences:
         - When the user asks to "add a step" to the sequence, create a new step with the specified content

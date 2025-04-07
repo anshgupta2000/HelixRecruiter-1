@@ -109,6 +109,10 @@
             background-color: #f2f2f2;
             align-self: flex-start;
         }
+        .follow-up-mode {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
         .sequence-step {
             border: 1px solid #eaeaea;
             border-radius: 8px;
@@ -383,16 +387,23 @@
             let isLoading = false;
             let currentSequence = null;
             let currentEditingStep = null;
+            let isAwaitingFollowUp = false;
+            let lastSequenceRequest = null;
             
             // Function to add a message to the chat
-            const addMessage = (content, isUser) => {
+            const addMessage = (content, isUser, isFollowUp = false) => {
                 const message = document.createElement('div');
                 message.className = `message ${isUser ? 'user-message' : 'assistant-message'}`;
+                if (isFollowUp) {
+                    message.classList.add('follow-up-mode');
+                }
                 message.textContent = content;
                 chatMessages.appendChild(message);
                 
                 // Scroll to bottom
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                return message;
             };
             
             // Function to add a loading indicator
@@ -422,6 +433,16 @@
                 if (loadingIndicator) {
                     loadingIndicator.remove();
                 }
+            };
+            
+            // Check if the message appears to be a sequence generation request
+            const isSequenceGenerationRequest = (message) => {
+                const lowerMessage = message.toLowerCase();
+                return (
+                    (lowerMessage.includes('create') || lowerMessage.includes('generate')) &&
+                    (lowerMessage.includes('sequence') || lowerMessage.includes('campaign')) &&
+                    (lowerMessage.includes('for') || lowerMessage.includes('at'))
+                );
             };
             
             // Function to open the step editor modal
@@ -754,6 +775,12 @@
                 if (!content || isLoading) return;
                 
                 try {
+                    // Check for sequence generation request pattern when not already in follow-up mode
+                    if (!isAwaitingFollowUp && isSequenceGenerationRequest(content)) {
+                        lastSequenceRequest = content;
+                        isAwaitingFollowUp = true;
+                    }
+                    
                     // Add user message to chat
                     addMessage(content, true);
                     
@@ -817,9 +844,26 @@
                         const lastMessage = existingMessages[existingMessages.length - 1];
                         
                         if (!lastMessage || !lastMessage.textContent.includes(latestMessage.content)) {
-                            // Hide loading and add the message
+                            // Hide loading
                             hideLoading();
-                            addMessage(latestMessage.content, false);
+                            
+                            // Check for ACTION blocks to determine if this is a follow-up question or a response with a sequence
+                            const hasActionBlock = latestMessage.content.includes('---ACTION:');
+                            
+                            // Add the message with appropriate styling
+                            const messageElement = addMessage(
+                                latestMessage.content, 
+                                false, 
+                                isAwaitingFollowUp && !hasActionBlock
+                            );
+                            
+                            // If this was a follow-up question (no action block) and we were awaiting it,
+                            // we're still in follow-up mode for the next user response
+                            if (isAwaitingFollowUp && hasActionBlock) {
+                                // If we got an action block, we're no longer in follow-up mode
+                                isAwaitingFollowUp = false;
+                                lastSequenceRequest = null;
+                            }
                             
                             // Check for sequence updates
                             checkForSequenceUpdates();
